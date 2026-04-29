@@ -1,0 +1,74 @@
+[
+    {
+        "code_barre": "12345678",
+        "nom": "shawarma",
+        "prix_unitaire_ht": 8000,
+        "date_expiration": "2026-04-23",
+        "quantite_stock": 7,
+        "date_enregistrement": "2026-04-23"
+    },
+    {
+        "code_barre": "12345677",
+        "nom": "eau swissta 10L",
+        "prix_unitaire_ht": 5000,
+        "date_expiration": "2026-04-23",
+        "quantite_stock": 45,
+        "date_enregistrement": "2026-04-23"
+    },
+    {
+        "code_barre": "5901234123457",
+        "nom": "lait coco 5l",
+        "prix_unitaire_ht": 7500,
+        "date_expiration": "2026-04-23",
+        "quantite_stock": 63,
+        "date_enregistrement": "2026-04-23"
+    },
+    {
+        "code_barre": "6009802903018",
+        "nom": "yaourt naturel",
+        "prix_unitaire_ht": 5000,
+        "date_expiration": "2026-04-23",
+        "quantite_stock": 55,
+        "date_enregistrement": "2026-04-23"
+    },
+    {
+        "code_barre": "0123456789012",
+        "nom": "pain au lait demi",
+        "prix_unitaire_ht": 4500,
+        "date_expiration": "2026-04-25",
+        "quantite_stock": 53,
+        "date_enregistrement": "2026-04-23"
+    },
+    {
+        "code_barre": "3398573350804",
+        "nom": "beurre RAMA",
+        "prix_unitaire_ht": 4500,
+        "date_expiration": "2026-12-25",
+        "quantite_stock": 33,
+        "date_enregistrement": "2026-04-23"
+    },
+    {
+        "code_barre": "06020900000000",
+        "nom": "sandwich au jumbo",
+        "prix_unitaire_ht": 5556,
+        "date_expiration": "2027-02-20",
+        "quantite_stock": 23,
+        "date_enregistrement": "2026-04-23"
+    },
+    {
+        "code_barre": "8435130500366",
+        "nom": "chocolat milka",
+        "prix_unitaire_ht": 3445,
+        "date_expiration": "2026-10-18",
+        "quantite_stock": 32,
+        "date_enregistrement": "2026-04-23"
+    },
+    {
+        "code_barre": "65833254",
+        "nom": "saucisses Sadia",
+        "prix_unitaire_ht": 3500,
+        "date_expiration": "2027-02-10",
+        "quantite_stock": 30,
+        "date_enregistrement": "2026-04-28"
+    }
+]

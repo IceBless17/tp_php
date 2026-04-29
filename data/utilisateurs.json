@@ -1,0 +1,26 @@
+[
+    {
+        "identifiant": "admin",
+        "mot_de_passe": "$2y$10$KcFz8JYPQOEGZv1r5Fhrj.uZCgdfg7XS3eWLBBDb8IimczvANg0ia",
+        "role": "super_admin",
+        "nom_complet": "Admin",
+        "date_creation": "2026-04-21",
+        "actif": true
+    },
+    {
+        "identifiant": "caissier",
+        "mot_de_passe": "$2y$10$AxaWJV9xg6pG8OezULGs0.3JXHd4DiW9wjIDCayFKBohYbc1me2uy",
+        "role": "caissier",
+        "nom_complet": "Samuel",
+        "date_creation": "2026-04-22",
+        "actif": true
+    },
+    {
+        "identifiant": "manager",
+        "mot_de_passe": "$2y$10$25DIVv.mdAW6FDihmneSUuxvr6E6NJxTQ2L3yKdmr0ctSkXaWIz3C",
+        "role": "manager",
+        "nom_complet": "blessing",
+        "date_creation": "2026-04-22",
+        "actif": true
+    }
+]

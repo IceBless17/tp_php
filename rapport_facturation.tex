@@ -1,0 +1,1203 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\lstset{
+    language=PHP,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    tabsize=2
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{Système de Facturation}
+
+\title{\textbf{SYSTÈME DE FACTURATION \\ AVEC LECTURE DE CODES-BARRES}}
+\author{VANGU NGOMA BLESSING \\ MBUMBU MANGOYO SAMUEL \\ BUNDJOKO MILAREPA}
+\date{Avril 2026}
+
+\begin{document}
+
+% ===================== PAGE DE GARDE =====================
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    {\Large \textbf{UNIVERSITÉ PROTESTANTE AU CONGO} \\}
+    {\large \textbf{FACULTÉ DES SCIENCES INFORMATIQUES} \\}
+    {\large B.P. 4745 KINSHASA 2 \\}
+    
+    \vspace*{3cm}
+    
+    {\LARGE \textbf{SYSTÈME DE FACTURATION} \\}
+    {\large Avec Lecture de Codes-Barres \\}
+    
+    \vspace*{2cm}
+    
+    {\large Programmation Web en PHP Procédural \\}
+    {\large Travaux Pratiques \\}
+    
+    \vspace*{4cm}
+    
+    {\large \textbf{Réalisé par :} \\}
+    {\normalsize VANGU NGOMA BLESSING \\}
+    {\normalsize MBUMBU MANGOYO SAMUEL \\}
+    {\normalsize BUNDJOKO MILAREPA \\}
+    
+    \vspace*{5cm}
+    
+    \raggedleft
+    {\large \textbf{Encadreur :} Assistant JIRHEL \\}
+    
+    \vspace*{3cm}
+    
+    \centering
+    {\large \textbf{Avril 2026}}
+    
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ===================== CHAPITRE 1: INTRODUCTION =====================
+\chapter{Introduction}
+
+\section{Contexte et Mise en Situation}
+
+Le système de facturation développé dans le cadre de ce projet académique répond à un besoin réel : moderniser le processus de vente d'un petit supermarché. Actuellement, les caissiers saisissent manuellement les articles, ce qui génère des erreurs et ralentit considérablement les transactions. Ce système informatisé, accessible via un navigateur web, permet de :
+
+\begin{itemize}
+    \item Lire automatiquement les codes-barres via la caméra d'un téléphone ou ordinateur
+    \item Générer des factures détaillées et horodatées
+    \item Gérer un catalogue de produits avec suivi du stock
+    \item Implémenter un système de contrôle d'accès basé sur les rôles
+    \item Produire des rapports journaliers et mensuels
+\end{itemize}
+
+\section{Objectifs Pédagogiques}
+
+À l'issue de ce projet, les étudiants sont capables de :
+
+\begin{enumerate}
+    \item Concevoir une application web PHP procédurale structurée
+    \item Utiliser les fichiers JSON comme mécanisme de persistance des données
+    \item Implémenter un système d'authentification avec gestion des rôles (RBAC)
+    \item Intégrer une bibliothèque de lecture de codes-barres (QuaggaJS)
+    \item Appliquer les principes de validation et d'assainissement des données
+    \item Rédiger un rapport technique en \LaTeX{}
+\end{enumerate}
+
+\section{Contrainte Fondamentale}
+
+Une contrainte majeure de ce projet est l'interdiction d'utiliser tout système de gestion de base de données (MySQL, PostgreSQL, SQLite, MongoDB). La persistance des données est assurée exclusivement par des fichiers au format JSON, stockés dans le répertoire \texttt{data/}.
+
+\section{Technologies Utilisées}
+
+\begin{itemize}
+    \item \textbf{PHP 7.4+} : langage de programmation côté serveur (procédural)
+    \item \textbf{HTML5} : structure sémantique des pages
+    \item \textbf{CSS3} : stylisation et mise en page
+    \item \textbf{JavaScript} : logique côté client (scanner, interactions)
+    \item \textbf{JSON} : format de sérialisation des données
+    \item \textbf{QuaggaJS} : librairie de lecture de codes-barres
+\end{itemize}
+
+% ===================== CHAPITRE 2: ARBORESCENCE COMMENTÉE =====================
+\chapter{Arborescence Commentée}
+
+\section{Vue Générale de la Structure}
+
+Le projet suit une architecture en couches séparant les responsabilités : configuration, authentification, logique métier, présentation et données.
+
+\begin{verbatim}
+facturation/
+  * index.php                    (Page d'accueil)
+  * config/
+      - config.php              (Configuration)
+  * auth/
+      - login.php               (Connexion)
+      - logout.php              (Deconnexion)
+      - session.php             (Sessions)
+  * includes/
+      - header.php              (En-tete)
+      - footer.php              (Pied de page)
+      - fonctions-auth.php      (Authentification)
+      - fonctions-produits.php  (CRUD produits)
+      - fonctions-factures.php  (Facturation)
+  * modules/
+      * produits/
+          - enregistrer.php     (Enregistrement)
+          - lire.php            (Details)
+          - liste.php           (Liste)
+      * facturation/
+          - nouvelle-facture.php (Creation)
+          - calcul.php          (Calculs)
+          - afficher-facture.php(Affichage)
+      * admin/
+          - gestion-comptes.php (Utilisateurs)
+          - ajouter-compte.php  (Creation)
+          - supprimer-compte.php(Suppression)
+  * data/
+      - produits.json           (Produits)
+      - factures.json           (Factures)
+      - utilisateurs.json       (Utilisateurs)
+  * assets/
+      * css/
+          - style.css           (Styles)
+      * js/
+          - scanner.js          (Scanner)
+      * images/
+  * rapports/
+      - rapport-journalier.php  (Quotidien)
+      - rapport-mensuel.php     (Mensuel)
+\end{verbatim}
+
+\section{Description Détaillée des Fichiers Clés}
+
+\subsection{Fichier : config/config.php}
+
+\textbf{Rôle :} Configuration centralisée de l'application.
+
+\textbf{Contenu fonctionnel :}
+\begin{itemize}
+    \item Initialisation des sessions PHP
+    \item Définition des constantes globales (chemins, taux TVA)
+    \item Fonctions utilitaires (échappement HTML, redirection, formatage)
+\end{itemize}
+
+\textbf{Fonctions principales :}
+\begin{itemize}
+    \item \texttt{h(\$value)} : Échappe les caractères spéciaux HTML (protection XSS)
+    \item \texttt{redirect(\$url)} : Redirection HTTP avec sortie
+    \item \texttt{post(\$key, \$default)} : Récupération sécurisée de données POST
+    \item \texttt{get(\$key, \$default)} : Récupération sécurisée de données GET
+    \item \texttt{format\_currency(\$amount)} : Formatage monétaire (CDF)
+\end{itemize}
+
+\subsection{Fichier : includes/fonctions-auth.php}
+
+\textbf{Rôle :} Gestion complète de l'authentification et du contrôle d'accès.
+
+\textbf{Fonctions critiques :}
+
+\begin{itemize}
+    \item \texttt{validate\_login(\$identifier, \$password)} : Valide les identifiants
+        \begin{itemize}
+            \item Recherche l'utilisateur par identifiant
+            \item Vérifie l'activation du compte
+            \item Compare le mot de passe avec le hash \texttt{password\_hash()}
+        \end{itemize}
+    
+    \item \texttt{login\_user(\$user)} : Crée la session utilisateur
+        \begin{itemize}
+            \item Stocke identifiant, nom complet, rôle en \texttt{\$\_SESSION}
+        \end{itemize}
+    
+    \item \texttt{current\_user()} : Retourne l'utilisateur connecté ou null
+    
+    \item \texttt{has\_role(\$roles)} : Vérifie les permissions de rôle
+        \begin{itemize}
+            \item Accepte un rôle (string) ou tableau de rôles
+            \item Retourne true si l'utilisateur a au moins un rôle requis
+        \end{itemize}
+    
+    \item \texttt{require\_roles(\$roles)} : Middleware de vérification
+        \begin{itemize}
+            \item Redirige vers login si non authentifié
+            \item Redirige vers index si accès non autorisé
+        \end{itemize}
+    
+    \item \texttt{save\_user(\$data)} : Enregistre un nouvel utilisateur
+        \begin{itemize}
+            \item Hache le mot de passe avec \texttt{password\_hash()}
+            \item Ajoute dates de création et statut actif
+            \item Écrit dans \texttt{utilisateurs.json}
+        \end{itemize}
+\end{itemize}
+
+\subsection{Fichier : includes/fonctions-produits.php}
+
+\textbf{Rôle :} Opérations CRUD sur le catalogue de produits.
+
+\textbf{Fonctions essentielles :}
+
+\begin{itemize}
+    \item \texttt{read\_json\_file(\$file)} : Lecture générique de fichiers JSON
+        \begin{itemize}
+            \item Crée le fichier s'il n'existe pas
+            \item Retourne un tableau associatif PHP
+        \end{itemize}
+    
+    \item \texttt{write\_json\_file(\$file, \$data)} : Écriture générique JSON
+        \begin{itemize}
+            \item Utilise \texttt{JSON\_PRETTY\_PRINT} pour lisibilité
+            \item Utilise \texttt{LOCK\_EX} pour sécurité concurrence
+        \end{itemize}
+    
+    \item \texttt{find\_product\_by\_barcode(\$barcode)} : Recherche par code-barres
+        \begin{itemize}
+            \item Parcourt le tableau des produits
+            \item Retourne le produit ou null
+        \end{itemize}
+    
+    \item \texttt{validate\_product\_data(\$data)} : Validation complète des données
+        \begin{itemize}
+            \item Vérifie présence des champs obligatoires
+            \item Valide numériques (prix, quantité)
+            \item Valide format date (AAAA-MM-JJ)
+            \item Vérifie l'unicité du code-barres
+        \end{itemize}
+    
+    \item \texttt{save\_product(\$data)} : Persistence d'un produit
+\end{itemize}
+
+\subsection{Fichier : includes/fonctions-factures.php}
+
+\textbf{Rôle :} Logique métier de la facturation.
+
+\textbf{Fonctions majeures :}
+
+\begin{itemize}
+    \item \texttt{generate\_invoice\_id()} : Génération d'identifiants uniques
+        \begin{itemize}
+            \item Format : FAC-YYYYMMDD-XXX
+            \item XXX : compteur quotidien (001, 002, ...)
+        \end{itemize}
+    
+    \item \texttt{add\_product\_to\_cart(\$barcode, \$quantity)} : Ajout au panier
+        \begin{itemize}
+            \item Valide l'existence du produit
+            \item Vérifie le stock disponible
+            \item Cumule les quantités si le produit existe déjà
+        \end{itemize}
+    
+    \item \texttt{calculate\_cart\_totals(\$cart)} : Calculs monétaires
+        \begin{itemize}
+            \item Total HT = somme des sous-totaux
+            \item TVA = Total HT × 18\%
+            \item Total TTC = Total HT + TVA
+        \end{itemize}
+    
+    \item \texttt{save\_invoice(\$cashierName)} : Enregistrement facture
+        \begin{itemize}
+            \item Valide le panier non-vide
+            \item Vérifie le stock avant sauvegarde
+            \item Décrémente le stock pour chaque produit
+            \item Horodate la facture (date et heure)
+        \end{itemize}
+    
+    \item \texttt{filter\_invoices\_by\_date(\$date)} : Rapport journalier
+    \item \texttt{filter\_invoices\_by\_month(\$month)} : Rapport mensuel
+\end{itemize}
+
+\subsection{Fichier : index.php (Page d'Accueil)}
+
+\textbf{Rôle :} Point d'entrée principal affichant le tableau de bord.
+
+\textbf{Logique :}
+\begin{enumerate}
+    \item Récupère les compteurs (produits, factures, utilisateurs)
+    \item Affiche le tableau de bord personnalisé selon le rôle
+    \item Utilisateur connecté : affiche les stats et liens rapides
+    \item Utilisateur non connecté : affiche page d'accueil publique
+\end{enumerate}
+
+\subsection{Fichier : auth/login.php}
+
+\textbf{Rôle :} Authentification des utilisateurs.
+
+\textbf{Flux :}
+\begin{enumerate}
+    \item Redirige si déjà connecté
+    \item Traite le POST (validation login)
+    \item Crée la session en cas de succès
+    \item Affiche les erreurs en cas d'échec
+\end{enumerate}
+
+\subsection{Fichier : modules/facturation/nouvelle-facture.php}
+
+\textbf{Rôle :} Interface de création de facture.
+
+\textbf{Actions possibles :}
+\begin{itemize}
+    \item Scan de code-barres (QuaggaJS)
+    \item Ajout d'articles au panier
+    \item Suppression d'articles du panier
+    \item Validation et sauvegarde de la facture
+\end{itemize}
+
+\subsection{Fichier : modules/admin/gestion-comptes.php}
+
+\textbf{Rôle :} Gestion des utilisateurs (super administrateur).
+
+\textbf{Fonctionnalités :}
+\begin{itemize}
+    \item Affiche la liste des utilisateurs en tableau
+    \item Colonne de suppression (sauf super admin)
+    \item Lien vers création de nouveau compte
+\end{itemize}
+
+\subsection{Fichier : rapports/rapport-journalier.php}
+
+\textbf{Rôle :} Génération de rapport du jour.
+
+\textbf{Traitement :}
+\begin{enumerate}
+    \item Récupère la date (paramètre GET, par défaut aujourd'hui)
+    \item Filtre les factures par date
+    \item Affiche nombre de factures et total TTC
+\end{enumerate}
+
+\subsection{Fichier : assets/css/style.css}
+
+\textbf{Rôle :} Stylisation globale de l'application.
+
+\textbf{Éléments stylisés :}
+\begin{itemize}
+    \item En-tête avec image de fond
+    \item Navigation avec menu déroulant
+    \item Cartes statistiques
+    \item Formulaires et boutons
+    \item Messages d'alerte (success/error)
+\end{itemize}
+
+\subsection{Fichier : assets/js/scanner.js}
+
+\textbf{Rôle :} Logique JavaScript du scanner de code-barres.
+
+\textbf{Fonctionnalité :}
+\begin{itemize}
+    \item Initialise QuaggaJS avec configuration caméra
+    \item Écoute les événements de détection de code-barres
+    \item Valide le format du code (EAN, UPC, Code128)
+    \item Insère le code dans le champ input associé
+\end{itemize}
+
+% ===================== CHAPITRE 3: STRUCTURES DE DONNÉES =====================
+\chapter{Structures de Données}
+
+\section{Format JSON et Justifications}
+
+Le projet utilise exclusivement le format JSON pour la persistance des données. Ce choix est justifié par :
+
+\begin{itemize}
+    \item \textbf{Simplicité} : Format texte lisible et éditable
+    \item \textbf{Compatibilité PHP} : \texttt{json\_decode()} et \texttt{json\_encode()} intégrés
+    \item \textbf{Flexibilité} : Pas de schéma rigide (ajout facile de champs)
+    \item \textbf{Contrôle} : Pas de dépendance externeDéveloppement
+\end{itemize}
+
+\section{Structure des Produits (produits.json)}
+
+\subsection{Format JSON}
+
+\begin{lstlisting}
+{
+  "code_barre": "3017620422003",
+  "nom": "Vain amour 1L",
+  "prix_unitaire_ht": 1200,
+  "date_expiration": "2026-12-31",
+  "quantite_stock": 50,
+  "date_enregistrement": "2026-04-17"
+}
+\end{lstlisting}
+
+\subsection{Champs et Justifications}
+
+\begin{itemize}
+    \item \texttt{code\_barre} (string) : Identifiant unique du produit, scannée via QuaggaJS
+    \item \texttt{nom} (string) : Désignation commerciale du produit
+    \item \texttt{prix\_unitaire\_ht} (float) : Prix HT pour calcul TVA ultérieur
+    \item \texttt{date\_expiration} (string, AAAA-MM-JJ) : Suivi d'expiration
+    \item \texttt{quantite\_stock} (int) : Suivi du stock en temps réel
+    \item \texttt{date\_enregistrement} (string) : Traçabilité de l'entrée
+\end{itemize}
+
+\section{Structure des Factures (factures.json)}
+
+\subsection{Format JSON}
+
+\begin{lstlisting}
+{
+  "id_facture": "FAC-20260417-001",
+  "date": "2026-04-17",
+  "heure": "10:35:22",
+  "caissier": "dan.mbo",
+  "articles": [
+    {
+      "code_barre": "3017620422003",
+      "nom": "Vain amour",
+      "prix_unitaire_ht": 1200,
+      "quantite": 10,
+      "sous_total_ht": 12000
+    }
+  ],
+  "total_ht": 12000,
+  "tva": 2160,
+  "total_ttc": 14160
+}
+\end{lstlisting}
+
+\subsection{Détail des Champs}
+
+\begin{itemize}
+    \item \texttt{id\_facture} (string) : Identifiant unique au format FAC-YYYYMMDD-XXX
+    \item \texttt{date} (string) : Date d'émission
+    \item \texttt{heure} (string) : Horodatage précis
+    \item \texttt{caissier} (string) : Identifiant de l'utilisateur
+    \item \texttt{articles} (array) : Tableau des lignes de facturation
+    \item \texttt{total\_ht}, \texttt{tva}, \texttt{total\_ttc} : Agrégats calculés
+\end{itemize}
+
+\section{Structure des Utilisateurs (utilisateurs.json)}
+
+\subsection{Format JSON}
+
+\begin{lstlisting}
+{
+  "identifiant": "ezechiel.itewe",
+  "mot_de_passe": "$2y$10$KcFz8JYPQOEGZv1r5Fhr...",
+  "role": "caissier",
+  "nom_complet": "Ezechiel Itewe",
+  "date_creation": "2026-04-17",
+  "actif": true
+}
+\end{lstlisting}
+
+\subsection{Champs et Sécurité}
+
+\begin{itemize}
+    \item \texttt{identifiant} (string) : Login unique de l'utilisateur
+    \item \texttt{mot\_de\_passe} (string) : Hash \texttt{password\_hash()} (Blowfish)
+        \begin{itemize}
+            \item Coût computationnel : 10 (par défaut)
+            \item Impossible à inverser
+            \item Sûr contre les attaques par force brute
+        \end{itemize}
+    \item \texttt{role} (string) : Un de \texttt{['caissier', 'manager', 'super\_admin']}
+    \item \texttt{nom\_complet} (string) : Affichage personnalisé
+    \item \texttt{date\_creation} (string) : Audit
+    \item \texttt{actif} (boolean) : Contrôle d'accès (true=autorisé, false=bloqué)
+\end{itemize}
+
+\section{Hiérarchie des Rôles et Permissions}
+
+\subsection{Rôle : Caissier}
+
+\textbf{Permissions :}
+\begin{itemize}
+    \item Lire codes-barres via caméra
+    \item Créer factures
+    \item Consulter factures émises
+\end{itemize}
+
+\textbf{Pages accessibles :}
+\begin{itemize}
+    \item \texttt{/facturation/index.php} (tableau de bord limité)
+    \item \texttt{/facturation/modules/facturation/nouvelle-facture.php}
+    \item \texttt{/facturation/modules/facturation/afficher-facture.php}
+\end{itemize}
+
+\subsection{Rôle : Manager}
+
+\textbf{Permissions :} Tous les droits du Caissier, plus :
+\begin{itemize}
+    \item Enregistrer nouveaux produits
+    \item Modifier stock de produits
+    \item Consulter rapports (journalier, mensuel)
+\end{itemize}
+
+\textbf{Pages accessibles :}
+\begin{itemize}
+    \item Toutes les pages du Caissier
+    \item \texttt{/facturation/modules/produits/enregistrer.php}
+    \item \texttt{/facturation/modules/produits/liste.php}
+    \item \texttt{/facturation/rapports/rapport-journalier.php}
+    \item \texttt{/facturation/rapports/rapport-mensuel.php}
+\end{itemize}
+
+\subsection{Rôle : Super Administrateur}
+
+\textbf{Permissions :} Tous les droits du Manager, plus :
+\begin{itemize}
+    \item Créer nouveaux comptes (Caissier, Manager)
+    \item Supprimer comptes utilisateurs
+    \item Activer/Désactiver comptes
+\end{itemize}
+
+\textbf{Pages accessibles :}
+\begin{itemize}
+    \item Toutes les pages précédentes
+    \item \texttt{/facturation/modules/admin/gestion-comptes.php}
+    \item \texttt{/facturation/modules/admin/ajouter-compte.php}
+    \item \texttt{/facturation/modules/admin/supprimer-compte.php}
+\end{itemize}
+
+% ===================== CHAPITRE 4: DESCRIPTION DES MODULES =====================
+\chapter{Description des Modules}
+
+\section{Module d'Authentification (auth/)}
+
+\subsection{Flux de Connexion}
+
+\textbf{login.php} :
+\begin{enumerate}
+    \item Redirection si déjà authentifié
+    \item Affichage du formulaire (identifiant + mot de passe)
+    \item Traitement POST :
+        \begin{enumerate}
+            \item Récupération et nettoyage des données
+            \item Appel à \texttt{validate\_login()}
+            \item Création session si valide
+            \item Redirection vers \texttt{index.php}
+        \end{enumerate}
+    \item Affichage d'erreur en cas d'identifiants invalides
+\end{enumerate}
+
+\textbf{Fonctions PHP utilisées :}
+\begin{itemize}
+    \item \texttt{session\_start()} : Initialisation session
+    \item \texttt{password\_verify(\$password, \$hash)} : Vérification mot de passe
+    \item \texttt{header('Location: ')} : Redirection HTTP
+\end{itemize}
+
+\subsection{Flux de Déconnexion}
+
+\textbf{logout.php} :
+\begin{enumerate}
+    \item Destruction des données de session
+    \item Destruction de la session
+    \item Redirection vers page de connexion
+\end{enumerate}
+
+\textbf{Fonction PHP :}
+\begin{itemize}
+    \item \texttt{session\_destroy()} : Suppression session serveur
+\end{itemize}
+
+\subsection{Vérification Middleware}
+
+\textbf{session.php} :
+\begin{itemize}
+    \item Incluse au début de toute page protégée
+    \item Appelle \texttt{require\_roles()} qui redirige si non autorisé
+    \item Centralise le contrôle d'accès
+\end{itemize}
+
+\section{Module des Produits (modules/produits/)}
+
+\subsection{enregistrer.php - Enregistrement Produit}
+
+\textbf{Flux :}
+\begin{enumerate}
+    \item Vérification : seuls Manager et Super Admin
+    \item Affichage du formulaire avec champs :
+        \begin{itemize}
+            \item Code-barres (scan ou saisie manuelle)
+            \item Nom du produit
+            \item Prix unitaire HT (numérique)
+            \item Date d'expiration (format AAAA-MM-JJ)
+            \item Quantité initiale en stock
+        \end{itemize}
+    \item Traitement POST :
+        \begin{enumerate}
+            \item Validation complète des données
+            \item Vérification unicité code-barres
+            \item Sauvegarde dans \texttt{produits.json}
+            \item Redirection vers liste si succès
+        \end{enumerate}
+\end{enumerate}
+
+\textbf{Validations Effectuées :}
+\begin{itemize}
+    \item \texttt{code\_barre} : non vide, unique
+    \item \texttt{prix\_unitaire\_ht} : numérique, positif
+    \item \texttt{quantite\_stock} : numérique, $\geq 0$
+    \item \texttt{date\_expiration} : format valide AAAA-MM-JJ
+    \item Tous les champs : présence obligatoire
+\end{itemize}
+
+\textbf{Fonctions PHP utilisées :}
+\begin{itemize}
+    \item \texttt{is\_numeric()} : Validation données numériques
+    \item \texttt{DateTime::createFromFormat()} : Validation format date
+\end{itemize}
+
+\subsection{liste.php - Consultation Catalogue}
+
+\textbf{Fonctionnalité :}
+\begin{itemize}
+    \item Affichage tableau de tous les produits
+    \item Colonnes : code-barres, nom, prix, stock, date d'expiration
+    \item Liens vers détails ou suppression (selon rôle)
+\end{itemize}
+
+\section{Module de Facturation (modules/facturation/)}
+
+\subsection{nouvelle-facture.php - Création Facture}
+
+\textbf{Flux Complet :}
+\begin{enumerate}
+    \item Initialisation du panier (session \texttt{\$\_SESSION['cart']})
+    \item Affichage interface scanner :
+        \begin{itemize}
+            \item Champ code-barres avec boutons scanner
+            \item Bouton pour activer/arrêter caméra QuaggaJS
+        \end{itemize}
+    \item Traitement POST d'ajout d'article :
+        \begin{enumerate}
+            \item Récupération code-barres et quantité
+            \item Appel \texttt{add\_product\_to\_cart()}
+            \item Validation existance produit
+            \item Vérification stock disponible
+            \item Cumul quantité si déjà en panier
+            \item Mise à jour session
+        \end{enumerate}
+    \item Affichage panier courant :
+        \begin{itemize}
+            \item Tableau articles : nom, prix unitaire, quantité, sous-total
+            \item Calcul totaux en temps réel
+            \item Boutons suppression par article
+        \end{itemize}
+    \item Validation et sauvegarde facture :
+        \begin{enumerate}
+            \item Vérification panier non-vide
+            \item Vérification stock une deuxième fois
+            \item Génération ID unique (FAC-YYYYMMDD-XXX)
+            \item Enregistrement dans \texttt{factures.json}
+            \item Mise à jour stock dans \texttt{produits.json}
+            \item Vidage du panier
+            \item Redirection vers affichage facture
+        \end{enumerate}
+\end{enumerate}
+
+\textbf{Formules de Calcul :}
+\begin{align}
+\text{Sous-Total HT} &= \text{Prix Unitaire HT} \times \text{Quantité} \\
+\text{Total HT} &= \sum \text{Sous-Totaux HT} \\
+\text{TVA (18\%)} &= \text{Total HT} \times 0.18 \\
+\text{Total TTC} &= \text{Total HT} + \text{TVA}
+\end{align}
+
+\subsection{afficher-facture.php - Consultation Facture}
+
+\textbf{Fonctionnalité :}
+\begin{itemize}
+    \item Affichage de la dernière facture créée
+    \item Détails complets (ID, date, heure, caissier)
+    \item Tableau articles détaillé
+    \item Récapitulatif financier
+\end{itemize}
+
+\section{Module d'Administration (modules/admin/)}
+
+\subsection{gestion-comptes.php - Liste Utilisateurs}
+
+\textbf{Fonctionnalité :}
+\begin{itemize}
+    \item Accès réservé au Super Admin
+    \item Tableau de tous les utilisateurs
+    \item Colonnes : identifiant, nom, rôle, statut actif, date création
+    \item Colonne action : suppression (sauf pour super admin)
+\end{itemize}
+
+\textbf{Logique :}
+\begin{itemize}
+    \item Lecture de \texttt{utilisateurs.json}
+    \item Itération et affichage
+    \item Contrôle de rôle sur bouton suppression
+\end{itemize}
+
+\subsection{ajouter-compte.php - Création Compte}
+
+\textbf{Formulaire :}
+\begin{itemize}
+    \item Identifiant (unique, validé)
+    \item Nom complet
+    \item Mot de passe ($\geq 6$ caractères)
+    \item Confirmation mot de passe
+    \item Sélection rôle (Caissier, Manager)
+\end{itemize}
+
+\textbf{Traitement :}
+\begin{enumerate}
+    \item Validation complète des données
+    \item Hachage mot de passe : \texttt{password\_hash(\$pwd, PASSWORD\_DEFAULT)}
+    \item Vérification unicité identifiant
+    \item Création entrée dans \texttt{utilisateurs.json}
+    \item Message succès et redirection
+\end{enumerate}
+
+\subsection{supprimer-compte.php - Suppression Compte}
+
+\textbf{Logique :}
+\begin{itemize}
+    \item Récupération identifiant (paramètre GET)
+    \item Vérification que le compte n'est pas super admin
+    \item Suppression de \texttt{utilisateurs.json}
+    \item Redirection vers gestion comptes
+\end{itemize}
+
+\section{Module Rapports (rapports/)}
+
+\subsection{rapport-journalier.php - Rapport du Jour}
+
+\textbf{Fonctionnalité :}
+\begin{itemize}
+    \item Accès : Manager, Super Admin
+    \item Sélection de la date via formulaire (input date HTML5)
+    \item Filtrage factures par date
+    \item Affichage :
+        \begin{itemize}
+            \item Nombre de factures du jour
+            \item Total TTC encaissé du jour
+        \end{itemize}
+\end{itemize}
+
+\textbf{Fonction PHP :}
+\begin{itemize}
+    \item \texttt{filter\_invoices\_by\_date(\$date)} : Filtre par date exacte
+\end{itemize}
+
+\subsection{rapport-mensuel.php - Rapport Mensuel}
+
+\textbf{Fonctionnalité :}
+\begin{itemize}
+    \item Sélection du mois/année
+    \item Filtre factures par mois (pattern AAAA-MM)
+    \item Affichage nombre et total du mois
+\end{itemize}
+
+\textbf{Fonction PHP :}
+\begin{itemize}
+    \item \texttt{filter\_invoices\_by\_month(\$month)} : Filtre via \texttt{strpos()}
+\end{itemize}
+
+% ===================== CHAPITRE 5: DIAGRAMME DE FLUX =====================
+\chapter{Diagramme de Flux}
+
+\section{Flux Complet d'une Transaction de Facturation}
+
+\subsection{Étape 1 : Authentification}
+
+\begin{verbatim}
+[Accès index.php]
+    |
+    +-- Utilisateur NON connecté --> Affiche page d'accueil publique
+    |
+    +-- Utilisateur connecté --> Continuez au tableau de bord
+        (Session $_SESSION['user'] valide)
+\end{verbatim}
+
+\subsection{Étape 2 : Accès Interface Facturation}
+
+\begin{verbatim}
+[Clic sur "Facturation"]
+    |
+    +-- Vérification rôle (require_roles)
+    |
+    +-- Affichage formulaire nouvelle-facture.php
+        |
+        +-- Initialisation panier (vide ou existant)
+        |
+        +-- Affichage scanner avec caméra
+\end{verbatim}
+
+\subsection{Étape 3 : Lecture Code-Barres}
+
+\begin{verbatim}
+[Utilisateur clique "Activer la caméra"]
+    |
+    +-- JavaScript (scanner.js) initialise QuaggaJS
+    |
+    +-- Caméra s'active
+    |
+    +-- QuaggaJS détecte code-barres
+    |
+    +-- Code validé (format EAN/UPC/Code128)
+    |
+    +-- Code inséré dans champ input
+\end{verbatim}
+
+\subsection{Étape 4 : Ajout Article au Panier}
+
+\begin{verbatim}
+[POST form with code_barres + quantite]
+    |
+    +-- Récupération produit de produits.json
+        |
+        +-- Produit NON trouvé
+        |   |
+        |   +-- Message d'erreur
+        |   |
+        |   +-- Redirection verso formulaire
+        |
+        +-- Produit trouvé
+            |
+            +-- Vérification stock disponible
+                |
+                +-- Stock insuffisant
+                |   |
+                |   +-- Message d'erreur
+                |
+                +-- Stock suffisant
+                    |
+                    +-- Création ligne article
+                    |
+                    +-- Calcul sous-total HT
+                    |
+                    +-- Ajout/cumul au panier (SESSION)
+                    |
+                    +-- Affichage panier mis à jour
+\end{verbatim}
+
+\subsection{Étape 5 : Suppression Article du Panier}
+
+\begin{verbatim}
+[Clic bouton "Supprimer"]
+    |
+    +-- Filtre panier (remove produit)
+    |
+    +-- Mise à jour SESSION['cart']
+    |
+    +-- Recalcul totaux
+    |
+    +-- Affichage panier mis à jour
+\end{verbatim}
+
+\subsection{Étape 6 : Validation et Sauvegarde Facture}
+
+\begin{verbatim}
+[POST action="save"]
+    |
+    +-- Vérification panier non-vide
+    |   |
+    |   +-- Panier vide
+    |   |   |
+    |   +-- Message erreur
+    |
+    +-- Vérification stock (une 2e fois)
+    |   |
+    |   +-- Stock changé depuis ajout
+    |   |   |
+    |   +-- Message erreur, facture annulée
+    |
+    +-- Génération ID : FAC-YYYYMMDD-XXX
+    |
+    +-- Calcul finaux :
+    |   - Total HT = Σ sous-totaux
+    |   - TVA = Total HT × 0.18
+    |   - Total TTC = Total HT + TVA
+    |
+    +-- Création structure facture (JSON)
+    |
+    +-- Écriture dans factures.json
+    |
+    +-- Décrémentation stock dans produits.json
+    |   (pour chaque article du panier)
+    |
+    +-- Vidage panier (SESSION['cart'] = [])
+    |
+    +-- Affichage récapitulatif facture
+\end{verbatim}
+
+\subsection{Étape 7 : Consultation Facture}
+
+\begin{verbatim}
+[Affichage facture générée]
+    |
+    +-- Récupération de $_SESSION['last_invoice']
+    |
+    +-- Affichage détails :
+    |   - ID facture
+    |   - Date et heure
+    |   - Caissier
+    |   - Tableau articles
+    |
+    +-- Affichage récapitulatif :
+    |   - Total HT
+    |   - Montant TVA (18%)
+    |   - Total TTC (net à payer)
+\end{verbatim}
+
+% ===================== CHAPITRE 6: DIFFICULTÉS RENCONTRÉES =====================
+\chapter{Difficultés Rencontrées et Solutions Apportées}
+
+\section{Difficultés}
+
+\subsection{1. Gestion de la Persistance Données (JSON vs Base de Données)}
+
+\textbf{Problème :}
+Sans système de base de données traditionnel, la gestion des lectures/écritures simultanées de fichiers JSON présente des risques :
+\begin{itemize}
+    \item Corruption de données en cas d'accès concurrent
+    \item Perte de données si deux requests écrivent simultanément
+    \item Overhead performance à chaque opération (lecture complète du fichier)
+\end{itemize}
+
+\textbf{Solution Apportée :}
+\begin{itemize}
+    \item Utilisation de \texttt{LOCK\_EX} lors des écritures :
+    \begin{lstlisting}
+file_put_contents($file, $json, LOCK_EX)
+    \end{lstlisting}
+    Cela garantit l'exclusivité de l'accès en écriture.
+    
+    \item Lecture avant écriture systématique pour maintenir cohérence
+    
+    \item Validation complète avant chaque sauvegarde
+\end{itemize}
+
+\subsection{2. Validation des Formats de Code-Barres}
+
+\textbf{Problème :}
+QuaggaJS peut détecter divers formats de codes-barres (EAN-13, UPC, Code128), mais certains formats invalides peuvent s'ajouter au panier.
+
+\textbf{Solution Apportée :}
+Dans \texttt{scanner.js}, validation stricte du format détecté :
+\begin{lstlisting}
+const isValidFormat = 
+    /^\d{8}$/.test(code) ||      // EAN-8
+    /^\d{12,13}$/.test(code) ||   // EAN-12 ou EAN-13
+    /^[A-Za-z0-9\-]{6,20}$/.test(code);  // Code128
+\end{lstlisting}
+
+Seuls les codes correspondant à ces patterns sont acceptés.
+
+\subsection{3. Gestion du Stock en Temps Réel}
+
+\textbf{Problème :}
+Risque de surstock : deux caissiers scannent le même article avec quantité insuffisante.
+\begin{itemize}
+    \item Caissier A : ajoute 30 unités (stock = 50)
+    \item Caissier B : ajoute 25 unités (stock = 50)
+    \item Total demandé : 55 > stock disponible : 50
+\end{itemize}
+
+\textbf{Solution Apportée :}
+\begin{itemize}
+    \item Vérification stock lors de l'ajout au panier (empêche débordement immédiat)
+    \item Vérification stock UNE DEUXIÈME FOIS avant sauvegarde de la facture (sécurité supplémentaire)
+    \item Message d'erreur explicite si stock insuffisant
+    \item Facture annulée et panier conservé pour correction
+\end{itemize}
+
+\subsection{4. Génération d'Identifiants Uniques pour Factures}
+
+\textbf{Problème :}
+Garantir que chaque facture a un ID unique au format FAC-YYYYMMDD-XXX où XXX est un compteur par jour.
+
+\textbf{Solution Apportée :}
+\begin{lstlisting}
+function generate_invoice_id() {
+    $invoices = get_all_invoices();
+    $today = date('Ymd');
+    $count = 0;
+    
+    foreach ($invoices as $invoice) {
+        if (strpos($invoice['id_facture'], 'FAC-' . $today) === 0) {
+            $count++;
+        }
+    }
+    
+    return 'FAC-' . $today . '-' . str_pad(
+        (string)($count + 1), 3, '0', STR_PAD_LEFT
+    );
+}
+\end{lstlisting}
+
+À chaque génération, on recount les factures du jour pour éviter les doublons.
+
+\subsection{5. Sécurité des Mots de Passe}
+
+\textbf{Problème :}
+Stockage sécurisé des mots de passe sans algorithmes cryptographiques modernes.
+
+\textbf{Solution Apportée :}
+Utilisation de \texttt{password\_hash()} (algorithme Blowfish) :
+\begin{lstlisting}
+$hashed_pwd = password_hash($password, PASSWORD_DEFAULT);
+$is_valid = password_verify($user_input, $hashed_pwd);
+\end{lstlisting}
+
+\begin{itemize}
+    \item Coût computationnel : 10 (par défaut, ajustable)
+    \item Résiste aux attaques GPU par force brute
+    \item Salt généré automatiquement et inclus dans le hash
+\end{itemize}
+
+\subsection{6. Prévention des Attaques XSS}
+
+\textbf{Problème :}
+Les données utilisateur (nom produit, noms utilisateurs) peuvent contenir du HTML/JavaScript malveillant.
+
+\textbf{Solution Apportée :}
+Fonction \texttt{h()} qui échappe tous les caractères spéciaux :
+\begin{lstlisting}
+function h($value) {
+    return htmlspecialchars(
+        (string)$value, 
+        ENT_QUOTES, 
+        'UTF-8'
+    );
+}
+\end{lstlisting}
+
+Utilisée systématiquement dans les affichages :
+\begin{lstlisting}
+<?php echo h($user['nom_complet']); ?>
+\end{lstlisting}
+
+\subsection{7. Menu Déroulant Responsive}
+
+\textbf{Problème :}
+Navigation classique avec lien simple "Rapports" ne permettait pas l'accès au rapport mensuel (par défaut affichait rapport journalier).
+
+\textbf{Solution Apportée :}
+Implémentation d'un menu déroulant CSS/HTML :
+\begin{itemize}
+    \item Lien parent "Rapports" avec \texttt{href="\#"}
+    \item Division enfant cachée (display: none)
+    \item Au survol (\texttt{:hover}) : affichage des liens (rapport journalier, mensuel)
+    \item Conservation uniformité style navigation
+\end{itemize}
+
+\subsection{8. Chemins URL Absolus vs Relatifs}
+
+\textbf{Problème :}
+Le fichier \texttt{scanner.js} était référencé avec URL absolue :
+\begin{lstlisting}
+<script src="http://localhost:8888/facturation/assets/js/scanner.js"></script>
+\end{lstlisting}
+
+Cela cassait le site si le port ou domaine changeait.
+
+\textbf{Solution Apportée :}
+Utilisation de chemins relatifs cohérents :
+\begin{lstlisting}
+<script src="/facturation/assets/js/scanner.js"></script>
+\end{lstlisting}
+
+% ===================== CHAPITRE 7: CONCLUSION ET PISTES D'AMÉLIORATION =====================
+\chapter{Conclusion et Pistes d'Amélioration}
+
+\section{Conclusion}
+
+Le système de facturation développé atteint tous les objectifs pédagogiques définis :
+
+\begin{itemize}
+    \item \textbf{Architecture structurée} : Séparation claire config/auth/métier/présentation
+    \item \textbf{Persistance par fichiers} : JSON comme alternative aux bases de données
+    \item \textbf{Authentification robuste} : Hachage sécurisé, contrôle d'accès basé rôles
+    \item \textbf{Intégration scan} : QuaggaJS fonctionnel pour lire codes-barres
+    \item \textbf{Logique métier complète} : Facturation, stock, calculs TVA, rapports
+    \item \textbf{Sécurité} : Protection XSS, validation entrées, verrouillage fichiers
+\end{itemize}
+
+Le projet démontre une compréhension approfondie du PHP procédural, de la gestion d'état et des bonnes pratiques web, malgré la contrainte de pas de base de données.
+
+\section{Pistes d'Amélioration}
+
+\subsection{1. Passage à une Base de Données Relationnelle}
+
+\textbf{Avantage :}
+\begin{itemize}
+    \item Performance améliorée (indexation, requêtes optimisées)
+    \item Gestion concurrence native
+    \item Requêtes complexes et rapports simplifiés
+\end{itemize}
+
+\textbf{Migration :}
+Utiliser \texttt{mysqli} ou \texttt{PDO} pour accéder à MySQL/PostgreSQL sans changer la logique métier.
+
+\subsection{2. Refactoring vers un Framework (Laravel, Symfony)}
+
+\textbf{Bénéfices :}
+\begin{itemize}
+    \item Routing automatique
+    \item ORM pour abstraction données
+    \item Validations intégrées
+    \item Système de templates (Blade, Twig)
+    \item Tests unitaires et fonctionnels
+\end{itemize}
+
+\subsection{3. Interface Utilisateur Enrichie}
+
+\textbf{Implémentation :}
+\begin{itemize}
+    \item Design responsive complèt
+    \item Utiliser librairie CSS (Bootstrap, Tailwind)
+    \item Graphiques de ventes (Chart.js, ApexCharts)
+    \item Pagination des listes
+    \item Filtres avancés sur rapports
+\end{itemize}
+
+\subsection{4. Fonctionnalités Additionnelles}
+
+\begin{itemize}
+    \item \textbf{Export PDF} : Génération factures PDF (TCPDF, mPDF)
+    \item \textbf{Historique modifications} : Audit trail des changements produits/stock
+    \item \textbf{Remises/Promotions} : Codes promo, réductions pourcentage
+    \item \textbf{Clientèle} : Gestion clients, historique achats, fidélité
+    \item \textbf{Paiements} : Intégration multiples modes (espèces, carte, mobile)
+    \item \textbf{Notifications} : Alerts stock faible, emails de rapport
+\end{itemize}
+
+\subsection{5. Sécurité Renforcée}
+
+\begin{itemize}
+    \item \textbf{HTTPS} : Chiffrement de la communication
+    \item \textbf{Rate limiting} : Prévention brute force login
+    \item \textbf{Logs audit} : Traçabilité complète des actions
+    \item \textbf{2FA} : Authentification double facteur
+    \item \textbf{Permissions granulaires} : Contrôle accès par fonctionnalité
+\end{itemize}
+
+\subsection{6. Performance et Scalabilité}
+
+\begin{itemize}
+    \item \textbf{Cache} : Mise en cache produits/utilisateurs fréquemment accédés
+    \item \textbf{CDN} : Distribution ressources statiques
+    \item \textbf{API REST} : Permettre applications mobiles natives
+    \item \textbf{Queue jobs} : Traitement asynchrone (rapports, exports)
+\end{itemize}
+
+\subsection{7. Tests Automatisés}
+
+\begin{itemize}
+    \item \textbf{Tests unitaires} : Validation fonctions métier (PHPUnit)
+    \item \textbf{Tests d'intégration} : Flux complets (facturation, login)
+    \item \textbf{Tests de charge} : Vérification sous charge élevée
+    \item \textbf{Coverage code} : Objectif $\geq 80\%$ de couverture
+\end{itemize}
+
+\section{Apprentissages Clés}
+
+Ce projet a permis d'acquérir des compétences essentielles :
+
+\begin{enumerate}
+    \item \textbf{Programmation procédurale} : Maîtrise PHP sans OOP
+    \item \textbf{Gestion d'état} : Sessions, cookies, données persistantes
+    \item \textbf{Validation et sécurité} : Input validation, output escaping
+    \item \textbf{Formats de données} : JSON, sérialisation, encodage
+    \item \textbf{Contrôle d'accès} : RBAC, permissions, authentification
+    \item \textbf{Conception modulaire} : Fonctions réutilisables, séparation responsabilités
+    \item \textbf{Gestion erreurs} : Messages explicites, redirection contrôlée
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,142 @@
+[
+    {
+        "id_facture": "FAC-20260423-001",
+        "date": "2026-04-23",
+        "heure": "17:21:02",
+        "caissier": "admin",
+        "articles": [
+            {
+                "code_barre": "12345678",
+                "nom": "shawarma",
+                "prix_unitaire_ht": 8000,
+                "quantite": 1,
+                "sous_total_ht": 8000
+            },
+            {
+                "code_barre": "12345677",
+                "nom": "eau swissta 10L",
+                "prix_unitaire_ht": 5000,
+                "quantite": 1,
+                "sous_total_ht": 5000
+            }
+        ],
+        "total_ht": 13000,
+        "tva": 2340,
+        "total_ttc": 15340
+    },
+    {
+        "id_facture": "FAC-20260423-002",
+        "date": "2026-04-23",
+        "heure": "19:14:58",
+        "caissier": "admin",
+        "articles": [
+            {
+                "code_barre": "5901234123457",
+                "nom": "lait coco 5l",
+                "prix_unitaire_ht": 7500,
+                "quantite": 1,
+                "sous_total_ht": 7500
+            }
+        ],
+        "total_ht": 7500,
+        "tva": 1350,
+        "total_ttc": 8850
+    },
+    {
+        "id_facture": "FAC-20260423-003",
+        "date": "2026-04-23",
+        "heure": "19:34:45",
+        "caissier": "admin",
+        "articles": [
+            {
+                "code_barre": "6009802903018",
+                "nom": "yaourt naturel",
+                "prix_unitaire_ht": 5000,
+                "quantite": 1,
+                "sous_total_ht": 5000
+            }
+        ],
+        "total_ht": 5000,
+        "tva": 900,
+        "total_ttc": 5900
+    },
+    {
+        "id_facture": "FAC-20260423-004",
+        "date": "2026-04-23",
+        "heure": "19:40:30",
+        "caissier": "admin",
+        "articles": [
+            {
+                "code_barre": "3398573350804",
+                "nom": "beurre RAMA",
+                "prix_unitaire_ht": 4500,
+                "quantite": 1,
+                "sous_total_ht": 4500
+            }
+        ],
+        "total_ht": 4500,
+        "tva": 810,
+        "total_ttc": 5310
+    },
+    {
+        "id_facture": "FAC-20260428-001",
+        "date": "2026-04-28",
+        "heure": "00:59:35",
+        "caissier": "admin",
+        "articles": [
+            {
+                "code_barre": "12345677",
+                "nom": "eau swissta 10L",
+                "prix_unitaire_ht": 5000,
+                "quantite": 1,
+                "sous_total_ht": 5000
+            },
+            {
+                "code_barre": "5901234123457",
+                "nom": "lait coco 5l",
+                "prix_unitaire_ht": 7500,
+                "quantite": 2,
+                "sous_total_ht": 15000
+            }
+        ],
+        "total_ht": 20000,
+        "tva": 3600,
+        "total_ttc": 23600
+    },
+    {
+        "id_facture": "FAC-20260428-002",
+        "date": "2026-04-28",
+        "heure": "01:05:53",
+        "caissier": "caissier",
+        "articles": [
+            {
+                "code_barre": "5901234123457",
+                "nom": "lait coco 5l",
+                "prix_unitaire_ht": 7500,
+                "quantite": 1,
+                "sous_total_ht": 7500
+            }
+        ],
+        "total_ht": 7500,
+        "tva": 1350,
+        "total_ttc": 8850
+    },
+    {
+        "id_facture": "FAC-20260428-003",
+        "date": "2026-04-28",
+        "heure": "01:12:52",
+        "caissier": "admin",
+        "articles": [
+            {
+                "code_barre": "12345677",
+                "nom": "eau swissta 10L",
+                "prix_unitaire_ht": 5000,
+                "quantite": 3,
+                "sous_total_ht": 15000
+            }
+        ],
+        "total_ht": 15000,
+        "tva": 2700,
+        "total_ttc": 17700
+    }
+]
